@@ -1,0 +1,10 @@
+{
+  "telegram_bot_token": "PON_AQUI_TU_TOKEN_DE_BOTFATHER",
+  "telegram_chat_id": "PON_AQUI_TU_CHAT_ID",
+  "fecha_limite": "2026-12-31",
+  "keyword_oficina": "lorca",
+  "keyword_tramite": "nacionalidad",
+  "intervalo_minutos": 15,
+  "debug": false,
+  "avisar_errores": true
+}

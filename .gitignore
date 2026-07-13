@@ -1,0 +1,6 @@
+config.json
+bot.log
+aviso.mp3
+debug_screenshots/*.png
+__pycache__/
+*.pyc

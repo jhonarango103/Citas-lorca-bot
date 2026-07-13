@@ -1,0 +1,47 @@
+name: Comprobar citas Registro Civil Lorca
+
+on:
+  schedule:
+    # Cada 15 minutos. GitHub puede retrasarlo unos minutos si hay mucha
+    # carga en sus servidores, es normal y no afecta al resultado.
+    - cron: "*/15 * * * *"
+  workflow_dispatch: {}   # te permite lanzarlo a mano desde la pestaña Actions
+
+permissions:
+  contents: write   # necesario para poder guardar estado.json entre ejecuciones
+
+jobs:
+  comprobar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependencias
+        run: |
+          pip install -r requirements.txt
+          playwright install --with-deps chromium
+
+      - name: Ejecutar comprobación
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          FECHA_LIMITE: ${{ vars.FECHA_LIMITE }}
+          KEYWORD_OFICINA: ${{ vars.KEYWORD_OFICINA }}
+          KEYWORD_TRAMITE: ${{ vars.KEYWORD_TRAMITE }}
+          DEBUG: "false"
+        run: python citas_lorca_bot.py --once
+
+      - name: Guardar estado.json (evita avisos repetidos)
+        run: |
+          git config user.name "citas-lorca-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add estado.json
+          git diff --cached --quiet || git commit -m "Actualiza estado [skip ci]"
+          git push || true
